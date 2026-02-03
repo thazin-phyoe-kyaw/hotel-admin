@@ -19,16 +19,17 @@ const menuGroups = [
     title: "User Information",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: Home },
-      { name: "Customers", href: "/customers", icon: Users },
       { name: "Rooms", href: "/rooms", icon: BedDouble },
+      { name: "Customers", href: "/customers", icon: Users },
+
       { name: "Bookings", href: "/bookings", icon: CalendarCheck },
     ],
   },
   {
     title: "Room Information",
     items: [
-      { name: "Rooms", href: "/rooms", icon: BedDouble },
-      { name: "Customers", href: "/customers", icon: Users },
+      { name: "Delxue", href: "/del", icon: BedDouble },
+      { name: "Settings", href: "/settings", icon: Settings },
       { name: "Bookings", href: "/bookings", icon: CalendarCheck },
     ],
   },
@@ -78,14 +79,14 @@ export default function Sidebar() {
         </button>
 
         {/* LOGO */}
-        <div className="p-5 ">
+        <div className="px-3 py-5 ">
           {/* <h1
             className={`font-bold text-xl transition-opacity duration-200 ${!isOpen && "opacity-0"}`}
           >
             Hotel Admin
           </h1> */}
-          <h1 className={`font-bold text-xl transition-opacity duration-200 `}>
-            Admin
+          <h1 className={`font-bold transition-opacity duration-200 `}>
+            ADMIN
           </h1>
         </div>
 
@@ -95,7 +96,7 @@ export default function Sidebar() {
             <div key={group.title} className=" shadow-sm ">
               {/* section title */}
               {!isOpen ? (
-                <div  />
+                <div />
               ) : (
                 <p
                   className={`
