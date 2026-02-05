@@ -1,18 +1,27 @@
 import { NextResponse } from "next/server";
-import { verifyRefreshToken } from "./app/lib/auth/token";
 
+export function middleware(req: {
+  cookies: { get: (arg0: string) => { (): any; new (): any; value: any } };
+  url: string | URL | undefined;
+}) {
+  const token = req.cookies.get("token")?.value;
+  const urlObj = typeof req.url === "string" ? new URL(req.url) : req.url;
+  const pathname = urlObj ? urlObj.pathname : "/";
 
-export function middleware(req: Request) {
-  // const refreshToken = req.headers.get("cookie")?.match(/refresh_token=([^;]+)/)?.[1];
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  if (token && pathname === "/") {
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  }
 
-  // if (!refreshToken) return NextResponse.redirect(new URL("/login", req.url));
-
-  // const valid = verifyRefreshToken(refreshToken);
-  // if (!valid) return NextResponse.redirect(new URL("/login", req.url));
-
-  // return NextResponse.next();
+  // If logged in and tries to access /login → send to dashboard
+  if (token && pathname === "/login") {
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  }
+  return NextResponse.next();
 }
 
 export const config = {
-  // matcher: ["/dashboard/:path*", "/rooms/:path*", "/bookings/:path*"],
+  matcher: ["/", "/admin/:path*"],
 };

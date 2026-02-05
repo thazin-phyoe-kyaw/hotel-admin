@@ -18,11 +18,11 @@ const menuGroups = [
   {
     title: "User Information",
     items: [
-      { name: "Dashboard", href: "/dashboard", icon: Home },
-      { name: "Rooms", href: "/rooms", icon: BedDouble },
-      { name: "Customers", href: "/customers", icon: Users },
+      { name: "Dashboard", href: "/admin/dashboard", icon: Home },
+      { name: "Rooms", href: "/admin/rooms", icon: BedDouble },
+      { name: "Customers", href: "/admin/customers", icon: Users },
 
-      { name: "Bookings", href: "/bookings", icon: CalendarCheck },
+      { name: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
     ],
   },
   {

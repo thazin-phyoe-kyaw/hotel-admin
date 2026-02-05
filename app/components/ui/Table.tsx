@@ -71,7 +71,7 @@ export default function DataTable<T extends { id: string | number }>({
   }
 
   return (
-    <div className="bg-white shadow rounded-md p-2 flex flex-col">
+    <div className="bg-white shadow rounded-md p-2 flex flex-col h-[calc(100vh-170px)]">
       {/* Search */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl">{name?.toUpperCase()} MANAGEMENT</h1>
@@ -98,7 +98,7 @@ export default function DataTable<T extends { id: string | number }>({
       </div>
 
       {/* table container */}
-      <div className="h-[500px] overflow-y-auto rounded-xl shadow-sm border border-gray-200">
+      <div className=" flex-1 overflow-y-auto rounded-xl shadow-sm border border-gray-200">
         <table className="w-full border-collapse h-full">
           <thead className="sticky top-0 bg-white z-10 shadow-sm">
             <tr className="text-gray-600">
@@ -153,7 +153,7 @@ export default function DataTable<T extends { id: string | number }>({
       </div>
 
       {/* pagination */}
-      <div className="flex justify-end mt-2">
+      <div className="flex justify-end mt-8 fixed bottom-2 right-5 bg-white pt-2 pb-1 ">
         <div className="flex items-center bg-white px-6 py-2 rounded-full shadow-lg space-x-4">
           <button
             disabled={page === 1}

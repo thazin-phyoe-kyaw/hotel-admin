@@ -1,5 +1,5 @@
+"use client";
 import LoginForm from "@/app/components/forms/Loginform";
-
 
 export default function LoginPage() {
   return (
@@ -19,7 +19,6 @@ export default function LoginPage() {
 
       {/* RIGHT SECTION */}
       <div className="flex items-center justify-center">
-        
         <LoginForm />
       </div>
     </div>
