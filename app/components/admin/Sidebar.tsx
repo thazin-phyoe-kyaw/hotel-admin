@@ -61,7 +61,8 @@ export default function Sidebar() {
       deleteCookie("token", { path: "/" });
 
       setIsLoggingOut(false);
-      router.push("/login");
+      window.location.href = "/login";
+      // router.push("/login");
     }
   };
 

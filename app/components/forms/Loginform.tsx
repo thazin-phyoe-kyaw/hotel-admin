@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuthStore } from "@/app/store/authStore";
@@ -16,16 +16,18 @@ export default function LoginForm() {
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   const setAuth = useAuthStore((state) => state.setAuth);
-
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+  
+    setLoading(true);
 
     try {
       const res = await api.post("/api/hotel/admin/login", { email, password });
 
-      const { token, role,user } = res.data.data;
+      const { token, role, user } = res.data.data;
 
       setAuth({ token, role, user });
 
@@ -76,13 +78,39 @@ export default function LoginForm() {
           className="pl-10 pr-10 py-2 w-full rounded-lg border shadow-sm"
         />
       </div>
-
       <button
+        type="submit"
+        disabled={loading}
+        className={`
+          group relative w-full py-2.5 px-4 rounded-xl font-semibold text-sm
+          flex items-center justify-center gap-2
+          transition-all duration-300 ease-in-out
+          ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed text-blue-50"
+              : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 active:scale-[0.98]"
+          }
+        `}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Authenticating...</span>
+          </>
+        ) : (
+          <>
+            <span>Log in</span>
+           
+          </>
+        )}
+      </button>
+
+      {/* <button
         type="submit"
         className="bg-blue-600 text-white w-full py-2 rounded-lg hover:bg-blue-700 transition"
       >
         Log In
-      </button>
+      </button> */}
     </form>
   );
 }
