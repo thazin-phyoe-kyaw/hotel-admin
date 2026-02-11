@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export function middleware(req: {
+export function proxy(req: {
   cookies: { get: (arg0: string) => { (): any; new (): any; value: any } };
   url: string | URL | undefined;
 }) {
