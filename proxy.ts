@@ -1,27 +1,25 @@
-import { NextResponse } from "next/server";
 
-export function proxy(req: {
-  cookies: { get: (arg0: string) => { (): any; new (): any; value: any } };
-  url: string | URL | undefined;
-}) {
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server"; // Type သတ်မှတ်ရန်
+
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-  const urlObj = typeof req.url === "string" ? new URL(req.url) : req.url;
-  const pathname = urlObj ? urlObj.pathname : "/";
+  const { pathname } = req.nextUrl;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    if (pathname !== "/login") {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    return NextResponse.next();
   }
-  if (token && pathname === "/") {
+
+  if (pathname === "/" || pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 
-  // If logged in and tries to access /login → send to dashboard
-  if (token && pathname === "/login") {
-    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-  }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/admin/:path*"],
+  matcher: ["/", "/login", "/admin/:path*"],
 };

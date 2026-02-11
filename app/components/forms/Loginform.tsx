@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useAuthStore } from "@/app/store/authStore";
+import api from "@/app/lib/api";
+import { setCookie } from "cookies-next";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -11,37 +15,26 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const setAuth = useAuthStore((state) => state.setAuth);
 
-  const handleLogin = async (e: { preventDefault: () => void }) => {
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setError("");
 
     try {
-      const res = await fetch(`/api/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-console.log(res)
-      const data = await res.json();
-      console.log(data);
+      const res = await api.post("/api/hotel/admin/login", { email, password });
 
-      if (!res.ok) {
-        setError(data.message || "Login failed");
-        return;
-      }
-console.log(data)
-      localStorage.setItem("token", data.token);
+      const { token, role,user } = res.data.data;
 
-      if (data.role === "admin") router.push("/admin/dashboard");
-      else router.push("/");
-    } catch (err) {
-      console.error(err);
-      setError("Network error");
+      setAuth({ token, role, user });
+
+      setCookie("token", token, { maxAge: 60 * 60 * 24, path: "/" });
+      router.push("/select-hotel");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Login failed");
     }
   };
-
   return (
     <form onSubmit={handleLogin} className="w-80 space-y-4">
       <h2 className="text-xl font-semibold mb-2">Log In to your Account</h2>
