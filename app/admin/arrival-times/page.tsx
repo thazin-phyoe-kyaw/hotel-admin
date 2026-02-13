@@ -4,7 +4,7 @@ import DeleteModal from "@/app/components/ui/DeleteModal";
 import Drawer from "@/app/components/ui/Drawer";
 import DataTable from "@/app/components/ui/Table";
 import api from "@/app/lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 
 type ArrivalTime = {
@@ -21,7 +21,8 @@ export default function ArrivalTimes() {
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string | number | null>(null); 
-  (null);
+
+  const formSubmitRef = useRef<(() => void) | null>(null);
 
   const getArrivalTimes = async () => {
     try {
@@ -41,7 +42,7 @@ export default function ArrivalTimes() {
 
     try {
         await api.delete(`/api/hotel/admin/arrival-times/${deleteId}`);
-      // Call API to delete arrival time by deleteId
+     
 
       await getArrivalTimes();
       setOpenDeleteModal(false);
@@ -93,13 +94,15 @@ export default function ArrivalTimes() {
           drawerMode === "add" ? "Add Arrival Time" : "Edit Arrival Time  "
         }
         onClose={() => setOpenDrawer(false)}
-        onSubmit={() => {}}
+        onSubmit={() => formSubmitRef.current?.()}  
+        // onSubmit={() => {}}
       >
         <ArrivalTimeForm
           mode={drawerMode}
           data={selectedRow as ArrivalTime | null}
           onClose={() => setOpenDrawer(false)}
           onSuccess={getArrivalTimes}
+          formSubmitRef={formSubmitRef}
         />
       </Drawer>
       <DeleteModal

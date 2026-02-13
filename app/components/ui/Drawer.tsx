@@ -51,22 +51,7 @@ export default function Drawer({
         <div className="p-4 overflow-y-auto flex-1">{children}</div>
 
         {/* footer */}
-        <div className="p-4 flex space-x-4 justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={onSubmit}
-            disabled={isSubmitting}
-            className="px-6 py-2 rounded-md bg-[#b778e9] text-white hover:bg-[#804ba8] disabled:opacity-50"
-          >
-            {isSubmitting ? "Saving..." : submitLabel}
-          </button>
-        </div>
+       
       </div>
     </div>
   );

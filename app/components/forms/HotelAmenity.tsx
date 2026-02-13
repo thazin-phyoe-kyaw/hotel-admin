@@ -168,12 +168,22 @@ export default function HotelAmenityForm({
       </div>
 
       {/* --- Submit --- */}
-      <button
-        type="submit"
-        className="w-full bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
-      >
-        {mode === "add" ? "Add Amenity" : "Update Amenity"}
-      </button>
+        <div className="p-4 flex space-x-4 justify-end fixed bottom-0 left-0 right-0 bg-white">
+  <button
+    type="button"
+    onClick={onClose}
+    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="submit"
+    className="px-2 bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
+  >
+    {mode === "add" ? "Add Hotel Amenity" : "Update Hotel Amenity"}
+  </button>
+</div>
     </form>
   );
 }

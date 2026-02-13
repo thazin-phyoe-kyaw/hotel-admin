@@ -60,35 +60,43 @@ export default function ArrivalTimeForm({
   };
 
   return (
-    <div >
+    <div>
       {/* <h2 className="text-xl font-semibold mb-4">
         {mode === "edit" ? "Edit Arrival Time" : "Add Arrival Time"}
       </h2> */}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-       
         <div>
           <label className="block font-medium mb-1">Name</label>
           <input
             type="text"
             {...register("name", { required: "Name is required" })}
             placeholder="Enter arrival time name"
-           className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
+            className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
           hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
           />
           {errors.name && (
             <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
         </div>
-          <button
-        type="submit"
-        className="w-full bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
-      >
-        {mode === "add" ? "Add Arrival Time" : "Update Arrival Time"}
-      </button>
 
-        {/* BUTTONS */}
-       
+      <div className="p-4 flex space-x-4 justify-end fixed bottom-0 left-0 right-0 bg-white">
+  <button
+    type="button"
+    onClick={onClose}
+    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="submit"
+    className="px-2 bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
+  >
+    {mode === "add" ? "Add Arrival Time" : "Update Arrival Time"}
+  </button>
+</div>
+
       </form>
     </div>
   );
