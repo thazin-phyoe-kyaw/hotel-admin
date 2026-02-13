@@ -119,49 +119,51 @@ export default function DataTable<T extends { id: string | number }>({
             </tr>
           </thead>
           <tbody>
-  {/* REAL ROWS */}
-  {pagedData.map((row) => (
-    <tr
-      key={row.id}
-      className="hover:bg-gray-50 transition-colors shadow-xs last:border-none"
-    >
-      {columns.map((col) => (
-        <td key={String(col.key)} className="px-4 py-2 text-gray-700 text-sm">
-          {col.render ? col.render(row) : String(row[col.key])}
-        </td>
-      ))}
+            {/* REAL ROWS */}
+            {pagedData.map((row) => (
+              <tr
+                key={row.id}
+                className="hover:bg-gray-50 transition-colors shadow-xs last:border-none"
+              >
+                {columns.map((col) => (
+                  <td
+                    key={String(col.key)}
+                    className="px-4 py-2 text-gray-700 text-sm"
+                  >
+                    {col.render ? col.render(row) : String(row[col.key])}
+                  </td>
+                ))}
 
-      <td className="px-4 py-3 flex gap-4">
-        <SquarePen
-          size={18}
-          className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
-          onClick={() => onEdit && onEdit(row)}
-        />
-        <OctagonX
-          size={18}
-          className="text-red-600 hover:text-red-800 cursor-pointer"
-          onClick={() => onDelete && onDelete(row.id)}
-        />
-      </td>
-    </tr>
-  ))}
+                <td className="px-4 py-4 flex gap-4">
+                  <SquarePen
+                    size={18}
+                    className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
+                    onClick={() => onEdit && onEdit(row)}
+                  />
+                  <OctagonX
+                    size={18}
+                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                    onClick={() => onDelete && onDelete(row.id)}
+                  />
+                </td>
+              </tr>
+            ))}
 
-  {/* FILLER ROWS */}
-  {Array.from({ length: emptyRows }).map((_, index) => (
-    <tr key={`empty-${index}`}>
-      {columns.map((col) => (
-        <td
-          key={String(col.key)}
-          className="px-4 py-4 text-gray-200 select-none"
-        >
-          •
-        </td>
-      ))}
-      <td className="px-4 py-4 text-gray-200 select-none">•</td>
-    </tr>
-  ))}
-</tbody>
-
+            {/* FILLER ROWS */}
+            {Array.from({ length: emptyRows }).map((_, index) => (
+              <tr key={`empty-${index}`}>
+                {columns.map((col) => (
+                  <td
+                    key={String(col.key)}
+                    className="px-4 py-2 text-gray-200 select-none"
+                  >
+                    •
+                  </td>
+                ))}
+                <td className="px-4 py-2 text-gray-200 select-none">•</td>
+              </tr>
+            ))}
+          </tbody>
 
           {/* <tbody>
             {pagedData.map((row) => (
