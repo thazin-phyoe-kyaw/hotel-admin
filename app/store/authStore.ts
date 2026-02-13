@@ -1,19 +1,13 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  profile_image?: string;
-}
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface AuthState {
   token: string | null;
   hotelId: string | null;
   role: string | null;
-  user: User | null;
+  user: any | null;
   selectedHotelName: string | null;
-  setAuth: (data: { token: string; role: string; user: User | null }) => void;
+  setAuth: (data: { token: string; role: string; user?: any }) => void;
   setHotel: (id: string, name: string) => void;
   logout: () => void;
 }
@@ -46,11 +40,13 @@ export const useAuthStore = create<AuthState>()(
           hotelId: null,
           role: null,
           user: null,
+          selectedHotelName: null,
         }),
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
+      // No need for onRehydrateStorage since setHydrated does not exist
     },
   ),
 );

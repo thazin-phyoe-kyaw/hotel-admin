@@ -39,7 +39,7 @@ export default function Drawer({
       >
         {/* header */}
         <div className="flex justify-between items-center p-4.5 shadow-sm">
-          <h2 className="text-lg font-semibold text-blue-600">{title}</h2>
+          <h2 className="text-[#b778e9] font-semibold ">{title}</h2>
           <X
             size={22}
             onClick={onClose}
@@ -62,7 +62,7 @@ export default function Drawer({
           <button
             onClick={onSubmit}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="px-6 py-2 rounded-md bg-[#b778e9] text-white hover:bg-[#804ba8] disabled:opacity-50"
           >
             {isSubmitting ? "Saving..." : submitLabel}
           </button>

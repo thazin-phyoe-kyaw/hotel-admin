@@ -21,7 +21,7 @@ export default function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-  
+
     setLoading(true);
 
     try {
@@ -44,7 +44,7 @@ export default function LoginForm() {
       {error && <p className="text-red-600 text-sm">{error}</p>}
 
       {/* Email */}
-      <div className="relative w-full">
+      {/* <div className="relative w-full">
         <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
         <input
           type="text"
@@ -52,7 +52,23 @@ export default function LoginForm() {
           placeholder="Enter Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="pl-10 pr-3 py-2 w-full rounded-lg border shadow-sm"
+          className="pl-10 pr-3 py-2 w-full rounded-lg border shadow-sm foucs:outline-none focus:ring-1 focus:ring-[#b778e9]  transition"
+        />
+      </div> */}
+      <div className="relative w-full">
+        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+
+        <input
+          type="text"
+          name="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="
+      pl-10 pr-3 py-2 w-full rounded-lg border border-none shadow-sm
+      focus:outline-none focus:ring-1 focus:ring-[#b778e9]
+      hover:border-[#b778e9] transition
+    "
         />
       </div>
 
@@ -75,9 +91,14 @@ export default function LoginForm() {
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="pl-10 pr-10 py-2 w-full rounded-lg border shadow-sm"
+          className="
+      pl-10 pr-10 py-2 w-full rounded-lg border border-none shadow-sm
+      focus:outline-none focus:ring-1 focus:ring-[#b778e9]
+      hover:border-[#b778e9] transition
+    "
         />
       </div>
+
       <button
         type="submit"
         disabled={loading}
@@ -87,8 +108,8 @@ export default function LoginForm() {
           transition-all duration-300 ease-in-out
           ${
             loading
-              ? "bg-blue-400 cursor-not-allowed text-blue-50"
-              : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 active:scale-[0.98]"
+              ? "bg-[#b778e9] cursor-not-allowed text-white shadow-lg shadow-[#b778e9]/50"
+              : "bg-[#b778e9] hover:bg-[#a062d0] text-white shadow-lg shadow-[#b778e9]/50 active:scale-[0.98]"
           }
         `}
       >
@@ -100,7 +121,6 @@ export default function LoginForm() {
         ) : (
           <>
             <span>Log in</span>
-           
           </>
         )}
       </button>

@@ -1,4 +1,5 @@
 export interface Column<T> {
+  render: any;
   key: keyof T;
   label: string;
   sortable?: boolean;

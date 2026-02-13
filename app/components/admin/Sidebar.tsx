@@ -14,6 +14,14 @@ import {
   HelpCircle,
   Loader2,
   Building2,
+  HeartHandshake,
+  Heart,
+  Clock,
+  GalleryVertical,
+  GalleryVerticalEnd,
+  MessageSquareHeart,
+  Grid2X2,
+  SquaresExclude,
 } from "lucide-react";
 
 import { useSidebar } from "@/app/hooks/useSidebar";
@@ -26,9 +34,20 @@ const menuGroups = [
     title: "User Information",
     items: [
       { name: "Dashboard", href: "/admin/dashboard", icon: Home },
-      { name: "Rooms", href: "/admin/rooms", icon: BedDouble },
-      { name: "Customers", href: "/admin/customers", icon: Users },
-      { name: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+      {
+        name: "Hotel Amenities",
+        href: "/admin/hotel-amenities",
+        icon: Heart,
+      },
+      { name: "Arrival Times", href: "/admin/arrival-times", icon: Clock },
+      { name: "Hotel Booking", href: "/admin/bookings", icon: GalleryVerticalEnd },
+      {
+        name: "Hotel Reviews",
+        href: "/admin/hotel-reviews",
+        icon: MessageSquareHeart,
+      },
+      { name: "Room Type", href: "/admin/room-types", icon: Grid2X2 },
+      { name: "Room", href: "/admin/rooms", icon: SquaresExclude },
     ],
   },
   {
@@ -104,7 +123,7 @@ export default function Sidebar() {
                   return (
                     <Link href={item.href} key={item.name}>
                       <div
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md transition ${active ? "bg-blue-100 text-blue-600 font-bold" : "hover:bg-gray-100"}`}
+                        className={`flex items-center gap-3 px-3 py-2 mb-1 rounded-md transition ${active ? "bg-blue-100 text-[#9c5ecc] font-semibold" : "hover:bg-gray-100"}`}
                       >
                         <Icon size={20} />
                         {isOpen && <span className="text-sm">{item.name}</span>}

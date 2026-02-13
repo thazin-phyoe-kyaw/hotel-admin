@@ -36,9 +36,10 @@ export default function Navbar() {
       <p className=" font-semibold text-slate-700">{hotelName?.toUpperCase()}</p>
 
       {/* Profile */}
-      <div className="font-semibold w-20 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">
+      <p className="font-semibold  text-[#b778e9]">{user?.name}</p>
+      {/* <div className="font-semibold px-5 py-1 rounded-full bg-[#b778e9] text-white flex items-center justify-center">
         {user?.name}
-      </div>
+      </div> */}
     </nav>
   );
 }
