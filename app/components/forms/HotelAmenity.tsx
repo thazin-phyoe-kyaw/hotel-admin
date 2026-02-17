@@ -14,14 +14,9 @@ const schema = z.object({
   active: z.boolean().default(true),
 });
 
-export default function HotelAmenityForm({
-  mode,
-  data,
-  onClose,
-  onSuccess,
-}: any) {
-  const [preview, setPreview] = useState(data?.icon || null);
+export default function HotelAmenityForm({ mode, data, onClose, onSuccess }: any) {
   const hotelId = useAuthStore((state) => state.hotelId);
+  const [preview, setPreview] = useState(data?.icon || null);
 
   const {
     register,
@@ -34,82 +29,79 @@ export default function HotelAmenityForm({
     defaultValues: {
       name: data?.name || "",
       active: data?.active ?? true,
-      icon: null,
+      // ❗ NO icon in defaultValues, fixes your issue!
     },
   });
 
+  // Handle Add / Edit modes
   useEffect(() => {
-  if (mode === "edit" && data) {
-    reset({
-      name: data.name ?? "",
-      icon: null,
-      active: data.active ?? true,
-    });
-    setPreview(data.icon || null);
-  } else {
-    reset({
-      name: "",
-      icon: null,
-      active: true,
-    });
-    setPreview(null);
-  }
-}, [mode, data, reset]);
-
-
-  const onSubmit = async (values: any) => {
-    try {
-      let iconString: string = data?.icon || "";
-      const file = values.icon?.[0];
-      if (file) {
-        iconString = file.name;
-      }
-
-      const amenityData = {
-        name: values.name,
-        icon: iconString,
-        active: values.active ? 1 : 0,
-        hotel_id: hotelId,
-      };
-
-      let response;
-
-      if (mode === "add") {
-        response = await api.post(
-          "/api/hotel/admin/hotel-amenities",
-          amenityData,
-        );
-      } else {
-        response = await api.put(
-          `/api/hotel/admin/hotel-amenities/${data.id}`,
-          amenityData,
-        );
-      }
-
-      onSuccess?.();
-
-      onClose();
-    } catch (err) {
-      console.log(err);
+    if (mode === "edit" && data?.id) {
+      reset({
+        name: data.name ?? "",
+        active: data.active ?? true,
+      });
+      setPreview(data.icon || null);
+    } else {
+      reset({
+        name: "",
+        active: true,
+      });
+      setPreview(null);
     }
-  };
+  }, [mode, data?.id, reset]);
+
+
+
+const onSubmit = async (values:any) => {
+  try {
+    const formData = new FormData();
+
+    formData.append("hotel_id", hotelId ?? "");
+    formData.append("name", values.name);
+    formData.append("active", values.active ? "1" : "0");
+
+    // Must send real FILE for backend
+    if (values.icon?.[0]) {
+      formData.append("icon", values.icon[0]);  // REAL FILE
+    }
+
+    let response;
+
+    if (mode === "add") {
+      response = await api.post("/api/hotel/admin/hotel-amenities", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    } else {
+      response = await api.put(
+        `/api/hotel/admin/hotel-amenities/${data.id}?_method=PUT`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+    }
+
+    onSuccess?.();
+    onClose();
+  } catch (err) {
+    console.log("UPLOAD ERROR:", err);
+  }
+};
+
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* --- Name --- */}
+
+      {/* Name */}
       <div>
         <label>Name</label>
         <input
           {...register("name")}
-          className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
-          hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
+          className="pl-2 py-2 w-full rounded-lg border border-gray-200 shadow-sm"
         />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
       </div>
 
-      {/* --- Icon Upload --- */}
+      {/* Icon Upload */}
       <div>
         <label className="font-semibold">Icon</label>
 
@@ -119,13 +111,10 @@ export default function HotelAmenityForm({
           render={({ field }) => (
             <>
               <div
-                className="mt-1 w-full px-3 py-2 rounded-lg border shadow-sm border-gray-200
-                hover:border-[#b778e9] focus-within:ring-1 focus-within:ring-[#b778e9]
-                cursor-pointer transition text-gray-500"
+                className="mt-1 w-full px-3 py-2 border rounded-lg shadow-sm cursor-pointer"
                 onClick={() => document.getElementById("iconInput")?.click()}
               >
-                Drag & drop your file or{" "}
-                <span className="text-[#b778e9] underline">browse</span>
+                Drag & drop or <span className="text-purple-500 underline">browse</span>
               </div>
 
               <input
@@ -133,12 +122,12 @@ export default function HotelAmenityForm({
                 type="file"
                 accept="image/*"
                 className="hidden"
+                value={undefined} // MUST be undefined for file input to work
                 onChange={(e) => {
-                  field.onChange(e.target.files);
+                  field.onChange(e.target.files); // store in RHF
                   const file = e.target.files?.[0];
                   if (file) {
-                    const url = URL.createObjectURL(file);
-                    setPreview(url);
+                    setPreview(URL.createObjectURL(file));
                   }
                 }}
               />
@@ -154,10 +143,9 @@ export default function HotelAmenityForm({
         />
       </div>
 
-      {/* --- Active Toggle --- */}
-      <div className="flex items-center justify-between">
+      {/* Active Toggle */}
+      <div className="flex justify-between items-center">
         <label className="font-semibold">Active</label>
-
         <Controller
           name="active"
           control={control}
@@ -167,23 +155,24 @@ export default function HotelAmenityForm({
         />
       </div>
 
-      {/* --- Submit --- */}
-        <div className="p-4 flex space-x-4 justify-end fixed bottom-0 left-0 right-0 bg-white">
-  <button
-    type="button"
-    onClick={onClose}
-    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-  >
-    Cancel
-  </button>
+      {/* Buttons */}
+      <div className="p-4 flex justify-end space-x-4 bg-white fixed bottom-0 left-0 right-0">
+        <button
+          type="button"
+          onClick={onClose}
+          className="border px-4 py-2 rounded-md"
+        >
+          Cancel
+        </button>
 
-  <button
-    type="submit"
-    className="px-2 bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
-  >
-    {mode === "add" ? "Add Hotel Amenity" : "Update Hotel Amenity"}
-  </button>
-</div>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-purple-500 text-white rounded-lg"
+        >
+          {mode === "add" ? "Add Hotel Amenity" : "Update Hotel Amenity"}
+        </button>
+      </div>
+
     </form>
   );
 }

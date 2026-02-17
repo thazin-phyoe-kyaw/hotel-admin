@@ -47,11 +47,7 @@ export default function Drawer({
           />
         </div>
 
-       
         <div className="p-4 overflow-y-auto flex-1">{children}</div>
-
-        {/* footer */}
-       
       </div>
     </div>
   );

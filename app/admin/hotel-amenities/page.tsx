@@ -19,6 +19,12 @@ type HotelAmenity = {
 export default function HotelAmenities() {
   const [loading, setLoading] = useState(false);
   const [hotelAmenities, setHotelAmenities] = useState([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | number | null>(null);
+  
   const getHotelsAmenities = async () => {
     try {
       setLoading(true);
@@ -48,13 +54,6 @@ export default function HotelAmenities() {
     getHotelsAmenities();
   }, []);
 
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
-  const [selectedRow, setSelectedRow] = useState<any>(null);
-
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | number | null>(null);
-
   return (
     <div>
       {/* {loading && <Loading />} */}
@@ -72,7 +71,7 @@ export default function HotelAmenities() {
             sortable: true,
             render: (row: HotelAmenity) => (
               <img
-                src={`https://bookoneclick.com/uploads/hotel-amenities/${row.icon}`}
+                src={`${row.icon}`}
                 alt={row.name}
                 className="h-10 w-10 object-cover rounded-md border"
               />

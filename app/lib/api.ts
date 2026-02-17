@@ -13,28 +13,17 @@ api.interceptors.request.use((config) => {
 
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
-  if (hotelId && config.url && !config.url.includes("/api/hotel/admin/hotels")) {
+  if (
+    hotelId &&
+    config.url &&
+    !config.url.includes("/api/hotel/admin/hotels")
+  ) {
     config.headers["X-Hotel-ID"] = hotelId;
   }
 
   return config;
 });
 
-// api.interceptors.request.use((config) => {
-//   const { token, hotelId } = useAuthStore.getState();
-
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   if (hotelId) {
-//     config.headers["X-Hotel-ID"] = hotelId;
-//   }
-
-//   return config;
-// });
-
-// Handle 401 Unauthorized globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
