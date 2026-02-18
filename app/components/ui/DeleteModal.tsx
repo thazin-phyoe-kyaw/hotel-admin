@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ConfirmModalProps } from "@/app/types/modal";
 import { XCircle } from "lucide-react";
 
@@ -10,7 +11,20 @@ export default function DeleteModal({
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
+  const [loading, setLoading] = useState(false);
+
   if (!open) return null;
+
+  const handleDelete = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      await onConfirm?.();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50">
@@ -25,14 +39,20 @@ export default function DeleteModal({
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+            disabled={loading}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50"
           >
             Cancel
           </button>
+
           <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            onClick={handleDelete}
+            disabled={loading}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
           >
+            {loading && (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            )}
             Delete
           </button>
         </div>

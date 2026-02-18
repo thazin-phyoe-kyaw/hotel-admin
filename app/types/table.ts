@@ -13,4 +13,5 @@ export interface TableProps<T> {
   searchPlaceholder?: string;
   name?: string;
   onAdd?: () => void;
+  loading?: boolean;
 }

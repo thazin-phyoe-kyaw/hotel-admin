@@ -1,7 +1,18 @@
+"use client";
+
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import Toggle from "../ui/Toggle";
 import api from "@/app/lib/api";
 import { useAuthStore } from "@/app/store/authStore";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+
+
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+  active: z.boolean().default(true),
+});
 
 export default function ArrivalTimeForm({
   mode,
@@ -9,95 +20,112 @@ export default function ArrivalTimeForm({
   onClose,
   onSuccess,
 }: any) {
+  const hotelId = useAuthStore((state) => state.hotelId);
+  const [submitting, setSubmitting] = useState(false);
+
+  
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
+      name: data?.name || "",
+      active: data?.active ?? true,
     },
   });
 
-  const hotelId = useAuthStore((state) => state.hotelId);
   useEffect(() => {
-    if (mode === "edit" && data) {
+    if (mode === "edit" && data?.id) {
       reset({
-        name: data.name || "",
+        name: data?.name ?? "",
+        active: data?.active ?? true,
       });
     } else {
-      reset({
-        name: "",
-      });
+      reset({ name: "", active: true });
     }
-  }, [mode, data, reset]);
+  }, [mode, data?.id, reset]);
 
+  
   const onSubmit = async (values: any) => {
+    if (submitting) return;
+    setSubmitting(true);
+
     try {
       const payload = {
+        hotel_id: hotelId,
         name: values.name,
         active: values.active ? 1 : 0,
-        hotel_id: hotelId,
       };
 
-      let response;
-
       if (mode === "add") {
-        response = await api.post("/api/hotel/admin/arrival-times", payload);
+        await api.post("/api/hotel/admin/arrival-times", payload);
       } else {
-        response = await api.put(
-          `/api/hotel/admin/arrival-times/${data.id}`,
-          payload,
-        );
+        await api.put(`/api/hotel/admin/arrival-times/${data.id}`, payload);
       }
 
       onSuccess?.();
       onClose();
     } catch (err) {
-      console.error(err);
+      console.error("ERROR:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
+ 
   return (
-    <div>
-      {/* <h2 className="text-xl font-semibold mb-4">
-        {mode === "edit" ? "Edit Arrival Time" : "Add Arrival Time"}
-      </h2> */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-24">
+   
+      <div>
+        <label>Name</label>
+        <input
+          {...register("name")}
+          className="pl-2 py-2 w-full rounded-lg border border-gray-200 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#b778e9] focus:border-[#b778e9] transition"
+        />
+        {errors.name && (
+          <p className="text-red-500 text-sm">{errors.name.message}</p>
+        )}
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Name</label>
-          <input
-            type="text"
-            {...register("name", { required: "Name is required" })}
-            placeholder="Enter arrival time name"
-            className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
-          hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
+      {/* ACTIVE TOGGLE */}
+      <div className="flex justify-between items-center">
+        <label className="font-semibold">Active</label>
+
+        <Controller
+          name="active"
+          control={control}
+          render={({ field }) => (
+            <Toggle checked={field.value} onChange={field.onChange} />
           )}
-        </div>
+        />
+      </div>
 
-      <div className="p-4 flex space-x-4 justify-end fixed bottom-0 left-0 right-0 bg-white">
-  <button
-    type="button"
-    onClick={onClose}
-    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-  >
-    Cancel
-  </button>
+      <div className="p-4 flex justify-end space-x-4 bg-white fixed bottom-0 left-0 right-0">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={submitting}
+          className="border px-4 py-2 rounded-md border-none shadow-sm hover:bg-gray-100 disabled:opacity-50 shadow-sm"
+        >
+          Cancel
+        </button>
 
-  <button
-    type="submit"
-    className="px-2 bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
-  >
-    {mode === "add" ? "Add Arrival Time" : "Update Arrival Time"}
-  </button>
-</div>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+        >
+          {submitting && (
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
 
-      </form>
-    </div>
+          {mode === "add" ? "Add Arrival Time" : "Update Arrival Time"}
+        </button>
+      </div>
+    </form>
   );
 }

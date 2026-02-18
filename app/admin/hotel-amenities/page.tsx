@@ -1,13 +1,13 @@
 "use client";
 
-import HotelAmenityForm from "@/app/components/forms/HotelAmenity";
-import DeleteModal from "@/app/components/ui/DeleteModal";
-import Drawer from "@/app/components/ui/Drawer";
-import Loading from "@/app/components/ui/Loading";
-import DataTable from "@/app/components/ui/Table";
-import api from "@/app/lib/api";
+import { useCallback, useEffect, useState } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+
+import api from "@/app/lib/api";
+import DataTable from "@/app/components/ui/Table";
+import Drawer from "@/app/components/ui/Drawer";
+import DeleteModal from "@/app/components/ui/DeleteModal";
+import HotelAmenityForm from "@/app/components/forms/HotelAmenity";
 
 type HotelAmenity = {
   id: string | number;
@@ -18,46 +18,70 @@ type HotelAmenity = {
 
 export default function HotelAmenities() {
   const [loading, setLoading] = useState(false);
-  const [hotelAmenities, setHotelAmenities] = useState([]);
-  const [openDrawer, setOpenDrawer] = useState(false);
+  const [amenities, setAmenities] = useState<HotelAmenity[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
-  const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedAmenity, setSelectedAmenity] = useState<HotelAmenity | null>(
+    null,
+  );
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
-  
-  const getHotelsAmenities = async () => {
+
+  const fetchAmenities = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await api.get("/api/hotel/admin/hotel-amenities");
-      setHotelAmenities(data?.data?.amenities || []);
-    } catch (err) {
-      console.error("Failed to fetch hotel amenities", err);
+      setAmenities(data?.data?.amenities || []);
+    } catch (error) {
+      console.error("Failed to fetch hotel amenities", error);
     } finally {
       setLoading(false);
     }
-  };
-  const handleDelete = async () => {
+  }, []);
+
+  const handleDelete = useCallback(async () => {
     if (!deleteId) return;
 
     try {
       await api.delete(`/api/hotel/admin/hotel-amenities/${deleteId}`);
-
-      await getHotelsAmenities();
-      setOpenDeleteModal(false);
-      setDeleteId(null);
+      await fetchAmenities();
     } catch (error) {
       console.error("Failed to delete amenity", error);
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteId(null);
     }
-  };
+  }, [deleteId, fetchAmenities]);
 
   useEffect(() => {
-    getHotelsAmenities();
-  }, []);
+    fetchAmenities();
+  }, [fetchAmenities]);
+
+  const handleAdd = () => {
+    setSelectedAmenity(null);
+    setDrawerMode("add");
+    setDrawerOpen(true);
+  };
+
+  const handleEdit = (row: HotelAmenity) => {
+    setSelectedAmenity(row);
+    setDrawerMode("edit");
+    setDrawerOpen(true);
+  };
+
+  const handleDeleteRequest = (id: string | number) => {
+    setDeleteId(id);
+    setDeleteModalOpen(true);
+  };
 
   return (
     <div>
-      {/* {loading && <Loading />} */}
       <DataTable
+        loading={loading}
+        name="Hotel Amenities"
+        searchPlaceholder="Search hotel amenities..."
+        data={amenities}
         columns={[
           {
             key: "name",
@@ -68,10 +92,10 @@ export default function HotelAmenities() {
           {
             key: "icon",
             label: "Icon",
-            sortable: true,
+            sortable: false,
             render: (row: HotelAmenity) => (
               <img
-                src={`${row.icon}`}
+                src={row.icon}
                 alt={row.name}
                 className="h-10 w-10 object-cover rounded-md border"
               />
@@ -89,48 +113,33 @@ export default function HotelAmenities() {
               ),
           },
         ]}
-        data={hotelAmenities as HotelAmenity[]}
-        onEdit={(row: HotelAmenity) => {
-          setSelectedRow(row);
-          setDrawerMode("edit");
-          setOpenDrawer(true);
-        }}
-        onDelete={(id: string | number) => {
-          setDeleteId(id);
-          setOpenDeleteModal(true);
-        }}
-        onAdd={() => {
-          setSelectedRow(null);
-          setDrawerMode("add");
-          setOpenDrawer(true);
-        }}
-        searchPlaceholder="Search hotel amenities..."
-        name="Hotel Amenities"
+        onAdd={handleAdd}
+        onEdit={handleEdit}
+        onDelete={handleDeleteRequest}
       />
 
+      {/* Drawer */}
       <Drawer
-        open={openDrawer}
+        open={drawerOpen}
         title={
           drawerMode === "add" ? "Add Hotel Amenity" : "Edit Hotel Amenity"
         }
-        onClose={() => setOpenDrawer(false)}
-        onSubmit={() => {}}
+        onClose={() => setDrawerOpen(false)}
+        onSubmit={() => {}} // Provide a no-op or appropriate handler
       >
         <HotelAmenityForm
           mode={drawerMode}
-          data={selectedRow as HotelAmenity | null}
-          onClose={() => setOpenDrawer(false)}
-          onSuccess={getHotelsAmenities}
+          data={selectedAmenity}
+          onClose={() => setDrawerOpen(false)}
+          onSuccess={fetchAmenities}
         />
       </Drawer>
 
+      {/* Delete Modal */}
       <DeleteModal
-        open={openDeleteModal}
-        onCancel={() => setOpenDeleteModal(false)}
-        onConfirm={() => {
-          handleDelete();
-          setOpenDeleteModal(false);
-        }}
+        open={deleteModalOpen}
+        onCancel={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
       />
     </div>
   );

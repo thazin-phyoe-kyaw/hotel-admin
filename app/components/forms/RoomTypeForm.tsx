@@ -1,153 +1,176 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import api from "@/app/lib/api";
 import { useAuthStore } from "@/app/store/authStore";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+
+const schema = z.object({
+  name: z.string().min(1, "Room type name is required"),
+  description: z.string().min(1, "Description is required"),
+  icon: z.any().optional(),
+});
 
 export default function RoomTypeForm({ mode, data, onClose, onSuccess }: any) {
+  const hotelId = useAuthStore((state) => state.hotelId);
+  const [submitting, setSubmitting] = useState(false);
+  const [preview, setPreview] = useState(data?.icon || null);
+
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors },
   } = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: data?.name || "",
+      description: data?.description || "",
     },
   });
 
-  const [iconFile, setIconFile] = useState<File | null>(null);
-  const hotelId = useAuthStore((state) => state.hotelId);
-
-  // Load old data when editing
+ 
   useEffect(() => {
-    if (mode === "edit" && data) {
+    if (mode === "edit" && data?.id) {
       reset({
-        name: data.name || "",
-        description: data.description || "",
+        name: data.name ?? "",
+        description: data.description ?? "",
       });
+      setPreview(data?.icon || null);
     } else {
-      reset({
-        name: "",
-        description: "",
-      });
+      reset({ name: "", description: "" });
+      setPreview(null);
     }
   }, [mode, data, reset]);
 
   const onSubmit = async (values: any) => {
+    if (submitting) return;
+    setSubmitting(true);
+
     try {
       const formData = new FormData();
+      formData.append("hotel_id", hotelId ?? "");
       formData.append("name", values.name);
       formData.append("description", values.description);
-      formData.append("hotel_id", hotelId ? String(hotelId) : "");
 
-      if (iconFile) {
-        formData.append("icon", iconFile);
+      if (values.icon?.[0]) {
+        formData.append("icon", values.icon[0]);
       }
 
-      let response;
-
       if (mode === "add") {
-        response = await api.post("/api/hotel/admin/room-types", formData, {
+        await api.post("/api/hotel/admin/room-types", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        response = await api.put(
+        await api.post(
           `/api/hotel/admin/room-types/${data.id}?_method=PUT`,
           formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
       }
 
       onSuccess?.();
       onClose();
     } catch (err) {
-      console.error(err);
+      console.error("Room type submit error:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-24">
-        {/* NAME */}
-        <div>
-          <label className="block font-medium mb-1">Room Type Name</label>
-          <input
-            type="text"
-            {...register("name", { required: "Name is required" })}
-            placeholder="Enter room type name"
-            className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
-          hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
-          )}
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-24">
+      {/* NAME */}
+      <div>
+        <label className="block font-medium mb-1">Room Type Name</label>
+        <input
+          {...register("name")}
+          placeholder="Enter room type name"
+          className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
+            hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
+        />
+        {errors.name && (
+          <p className="text-red-500 text-sm">{errors.name.message}</p>
+        )}
+      </div>
 
-        {/* DESCRIPTION */}
-        <div>
-          <label className="block font-medium mb-1">Description</label>
-          <input
-            type="text"
-            {...register("description", {
-              required: "Description is required",
-            })}
-            placeholder="Enter room type description"
-            className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
-          hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
-          />
-          {errors.description && (
-            <p className="text-red-500 text-sm">{errors.description.message}</p>
-          )}
-        </div>
+      {/* DESCRIPTION */}
+      <div>
+        <label className="block font-medium mb-1">Description</label>
+        <input
+          {...register("description")}
+          placeholder="Enter description"
+          className="pl-2 py-2 w-full rounded-lg shadow-sm border border-gray-200
+            hover:border-[#b778e9] focus:ring-1 focus:ring-[#b778e9] focus:outline-none transition"
+        />
+        {errors.description && (
+          <p className="text-red-500 text-sm">{errors.description.message}</p>
+        )}
+      </div>
 
-        {/* ICON FILE UPLOAD */}
-        <div>
-          <label className="block font-medium mb-1">Icon</label>
+      {/* ICON UPLOAD */}
+      <div>
+        <label className="block font-medium mb-1">Icon</label>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setIconFile(e.target.files?.[0] || null)}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-              file:rounded-lg file:border-0 file:text-sm file:font-semibold
-              file:bg-[#b778e9] file:text-white hover:file:bg-[#804ba8]"
-          />
-
-          {mode === "edit" && data?.icon && (
-            <div className="mt-2">
-              <p className="text-sm text-gray-600">Current Icon:</p>
-              <img
-                src={data.icon}
-                alt="Current icon"
-                className="w-12 h-12 rounded-md border mt-1"
+        <Controller
+          name="icon"
+          control={control}
+          render={({ field }) => (
+            <>
+              <input
+                type="file"
+                accept="image/*"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0 file:text-sm file:font-semibold
+                  file:bg-[#b778e9] file:text-white hover:file:bg-[#804ba8]"
+                onChange={(e) => {
+                  field.onChange(e.target.files ?? null);
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setPreview(URL.createObjectURL(file));
+                  }
+                }}
               />
-            </div>
+
+              {preview && (
+                <img
+                  src={preview}
+                  alt="preview"
+                  className="mt-2 h-16 w-16 rounded-md object-cover border"
+                />
+              )}
+            </>
           )}
-        </div>
+        />
+      </div>
 
-        {/* ACTION BUTTONS */}
-        <div className="p-4 flex space-x-4 justify-end fixed bottom-0 left-0 right-0 bg-white border-t">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-          >
-            Cancel
-          </button>
+      
+      <div className="p-4 flex justify-end space-x-4 bg-white fixed bottom-0 left-0 right-0 ">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={submitting}
+          className="px-4 py-2 rounded-md border border-none shadow-sm hover:bg-gray-100"
+        >
+          Cancel
+        </button>
 
-          <button
-            type="submit"
-            className="px-4 bg-[#b778e9] text-white py-2 rounded-lg hover:bg-[#804ba8] transition"
-          >
-            {mode === "add" ? "Add Room Type" : "Update Room Type"}
-          </button>
-        </div>
-      </form>
-    </div>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="px-4 py-2 bg-[#b778e9] text-white rounded-lg flex items-center gap-2"
+        >
+          {submitting && (
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          )}
+
+          {mode === "add" ? "Add Room Type" : "Update Room Type"}
+        </button>
+      </div>
+    </form>
   );
 }

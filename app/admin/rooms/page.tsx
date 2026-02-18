@@ -1,59 +1,90 @@
 "use client";
 
-import RoomForm from "@/app/components/forms/RoomForm";
-import DeleteModal from "@/app/components/ui/DeleteModal";
-import Drawer from "@/app/components/ui/Drawer";
-import DataTable from "@/app/components/ui/Table";
+import { useCallback, useEffect, useState } from "react";
 import api from "@/app/lib/api";
-import { useEffect, useState } from "react";
+
+import DataTable from "@/app/components/ui/Table";
+import Drawer from "@/app/components/ui/Drawer";
+import DeleteModal from "@/app/components/ui/DeleteModal";
+import RoomForm from "@/app/components/forms/RoomForm";
 
 export default function RoomsPage() {
-  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [openFeaturesModal, setOpenFeaturesModal] = useState(false);
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [rooms, setRooms] = useState([]);
 
-  const getRooms = async () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+
+  // =========================
+  // ✅ Fetch Rooms
+  // =========================
+  const fetchRooms = useCallback(async () => {
     try {
       setLoading(true);
       const { data } = await api.get("/api/hotel/admin/rooms");
       setRooms(data?.data?.rooms || []);
-    } catch (err) {
-      console.error("Failed to fetch rooms", err);
+    } catch (error) {
+      console.error("Failed to fetch rooms", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteId) return;
-    try {
-      await api.delete(`/api/hotel/admin/rooms/${deleteId}`);
-      await getRooms();
-      setOpenDeleteModal(false);
-      setDeleteId(null);
-    } catch (error) {
-      console.error("Failed to delete room", error);
-    }
-  };
+  }, []);
 
   useEffect(() => {
-    getRooms();
-  }, []);
+    fetchRooms();
+  }, [fetchRooms]);
+
+  // =========================
+  // ✅ Delete Room
+  // =========================
+  const handleDelete = useCallback(async () => {
+    if (!deleteId) return;
+
+    try {
+      await api.delete(`/api/hotel/admin/rooms/${deleteId}`);
+      await fetchRooms();
+    } catch (error) {
+      console.error("Failed to delete room", error);
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteId(null);
+    }
+  }, [deleteId, fetchRooms]);
+
+  // =========================
+  // Add/Edit Handlers
+  // =========================
+  const handleAdd = () => {
+    setSelectedRoom(null);
+    setDrawerMode("add");
+    setDrawerOpen(true);
+  };
+
+  const handleEdit = (row: any) => {
+    setSelectedRoom(row.raw);
+    setDrawerMode("edit");
+    setDrawerOpen(true);
+  };
+
+  const handleDeleteRequest = (id: number | string) => {
+    setDeleteId(typeof id === "number" ? id : parseInt(id));
+    setDeleteModalOpen(true);
+  };
+
+  // =========================
+  // Table Format (same UI)
+  // =========================
 
   const tableRooms = rooms.map((room: any) => ({
     id: room.id,
     name: room.name,
     room_no: room.room_no,
     type: room.hotel_room_type?.name || "N/A",
-    featuresPreview:
-      room.features.slice(0, 2).join(", ") +
-      (room.features.length > 2 ? "" : ""),
+    features: room.features,
     price: room.price,
     status: room.is_active ? "Active" : "Inactive",
     raw: room,
@@ -62,27 +93,32 @@ export default function RoomsPage() {
   return (
     <div>
       <DataTable
+        loading={loading}
+        name="Rooms"
+        searchPlaceholder="Search rooms..."
+        data={tableRooms}
         columns={[
           {
             key: "name",
             label: "Room Name",
             sortable: true,
-            render: undefined,
+            render: (row: any) => <span>{row.name}</span>,
           },
           {
             key: "room_no",
             label: "Room No",
             sortable: true,
-            render: undefined,
+            render: (row: any) => <span>{row.room_no}</span>,
           },
           {
             key: "type",
             label: "Type",
             sortable: true,
-            render: undefined,
+            render: (row: any) => <span>{row.type}</span>,
           },
+
           {
-            key: "featuresPreview",
+            key: "features",
             label: "Features",
             render: (row: any) => (
               <div className="flex flex-wrap gap-1">
@@ -94,45 +130,15 @@ export default function RoomsPage() {
                     {f}
                   </span>
                 ))}
-
-                {/* {row.raw.features.length > 3 && (
-                  <button
-                    className="text-blue-600 text-xs underline"
-                    onClick={() => {
-                      setSelectedFeatures(row.raw.features);
-                      setOpenFeaturesModal(true);
-                    }}
-                  >
-                    +{row.raw.features.length - 3} more
-                  </button>
-                )} */}
               </div>
             ),
           },
-          // {
-          //   key: "featuresPreview",
-          //   label: "Features",
-          //   render: (row: any) => (
-          //     <div className="flex items-center gap-2">
-          //       <span>{row.featuresPreview}</span>
-          //       <button
-          //         className="text-blue-600 bg-[#E0E7FF] px-2 py-1 rounded text-sm"
-          //         onClick={() => {
-          //           setSelectedFeatures(row.raw.features);
-          //           setOpenFeaturesModal(true);
-          //         }}
-          //       >
-          //         View All
-          //       </button>
-          //     </div>
-          //   ),
-          // },
 
           {
             key: "price",
             label: "Price",
             sortable: true,
-            render: undefined,
+            render: (row: any) => <span>{row.price}</span>,
           },
 
           {
@@ -151,68 +157,32 @@ export default function RoomsPage() {
             ),
           },
         ]}
-        data={tableRooms}
-        name="Rooms"
-        searchPlaceholder="Search rooms..."
-        onAdd={() => {
-          setSelectedRow(null);
-          setDrawerMode("add");
-          setOpenDrawer(true);
-        }}
-        onEdit={(row: any) => {
-          setSelectedRow(row.raw);
-          setDrawerMode("edit");
-          setOpenDrawer(true);
-        }}
-        onDelete={(id: string | number) => {
-          setDeleteId(typeof id === "number" ? id : parseInt(id));
-          setOpenDeleteModal(true);
-        }}
+        onAdd={handleAdd}
+        onEdit={handleEdit}
+        onDelete={handleDeleteRequest}
       />
 
+      {/* Drawer */}
       <Drawer
-        open={openDrawer}
+        open={drawerOpen}
         title={drawerMode === "add" ? "Add Room" : "Edit Room"}
-        onClose={() => setOpenDrawer(false)}
-        onSubmit={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        onClose={() => setDrawerOpen(false)}
+        onSubmit={() => {}}
       >
         <RoomForm
           mode={drawerMode}
-          data={selectedRow}
-          onClose={() => setOpenDrawer(false)}
-          onSuccess={getRooms}
+          data={selectedRoom}
+          onClose={() => setDrawerOpen(false)}
+          onSuccess={fetchRooms}
         />
       </Drawer>
 
+      {/* Delete Modal */}
       <DeleteModal
-        open={openDeleteModal}
-        onCancel={() => setOpenDeleteModal(false)}
+        open={deleteModalOpen}
+        onCancel={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}
       />
-
-      {/* {openFeaturesModal && (
-        <div className="fixed inset-0 bg-black/30 flex items-end">
-          <div className="bg-white w-full rounded-t-2xl p-6 shadow-xl animate-slideUp">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">All Features</h2>
-              <button onClick={() => setOpenFeaturesModal(false)}>✖</button>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {selectedFeatures.map((f, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                >
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

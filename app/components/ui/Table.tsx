@@ -23,6 +23,7 @@ export default function DataTable<T extends { id: string | number }>({
   onAdd,
   searchPlaceholder = "Search...",
   name,
+  loading,
 }: TableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
@@ -31,14 +32,14 @@ export default function DataTable<T extends { id: string | number }>({
 
   const ITEMS_PER_PAGE = 10;
 
-  // SEARCH
+  // search
   const filteredData = useMemo(() => {
     return data.filter((row) =>
       Object.values(row).join(" ").toLowerCase().includes(search.toLowerCase()),
     );
   }, [data, search]);
 
-  // SORT
+  // sort
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
 
@@ -52,7 +53,7 @@ export default function DataTable<T extends { id: string | number }>({
     });
   }, [filteredData, sortKey, sortDir]);
 
-  // PAGINATION
+  // pagi
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
   const pagedData = sortedData.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -88,7 +89,7 @@ export default function DataTable<T extends { id: string | number }>({
           </div>
 
           <button
-            className="ml-3 flex items-center bg-[#b778e9]  text-white px-3 py-2 rounded-lg hover:bg-[#804ba8]"
+            className="ml-3 flex items-center bg-[#b778e9] text-white px-3 py-2 rounded-lg hover:bg-[#804ba8]"
             onClick={() => onAdd && onAdd()}
           >
             <PlusCircleIcon className="w-5 h-5 mr-2" />
@@ -98,12 +99,12 @@ export default function DataTable<T extends { id: string | number }>({
       </div>
 
       {/* table container */}
-      <div className=" flex-1 overflow-y-auto rounded-xl shadow-sm border border-gray-200">
+      <div className="flex-1 overflow-y-auto rounded-xl shadow-sm border border-gray-200">
         <table className="w-full border-collapse h-full">
           <thead className="sticky top-0 bg-white z-10 shadow-sm">
             <tr className="text-gray-600">
               {columns.map((col) => (
-                <th key={String(col.key)} className="px-4 py-3  text-left ">
+                <th key={String(col.key)} className="px-4 py-3 text-left">
                   <div
                     className={`flex items-center gap-1 ${
                       col.sortable ? "cursor-pointer" : ""
@@ -111,94 +112,79 @@ export default function DataTable<T extends { id: string | number }>({
                     onClick={() => col.sortable && toggleSort(col.key)}
                   >
                     {col.label}
-                    {/* {col.sortable && <ArrowUpDown size={14} />} */}
                   </div>
                 </th>
               ))}
               <th className="px-4 py-3 text-left font-semibold">Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {/* REAL ROWS */}
-            {pagedData.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-gray-50 transition-colors shadow-xs last:border-none"
-              >
-                {columns.map((col) => (
-                  <td
-                    key={String(col.key)}
-                    className="px-4 py-2 text-gray-700 text-sm"
-                  >
-                    {col.render ? col.render(row) : String(row[col.key])}
+            {loading ? (
+              /*  Skelenton */
+              Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                <tr key={`sk-${index}`} className="animate-pulse">
+                  {columns.map((col) => (
+                    <td
+                      key={String(col.key)}
+                      className="px-4 py-2 text-gray-300 select-none"
+                    >
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </td>
+                  ))}
+                  <td className="px-4 py-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </td>
+                </tr>
+              ))
+            ) : (
+              <>
+               
+                {pagedData.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="hover:bg-gray-50 transition-colors shadow-xs last:border-none"
+                  >
+                    {columns.map((col) => (
+                      <td
+                        key={String(col.key)}
+                        className="px-4 py-2 text-gray-700 text-sm"
+                      >
+                        {col.render ? col.render(row) : String(row[col.key])}
+                      </td>
+                    ))}
+
+                    <td className="px-4 py-4 flex gap-4">
+                      <SquarePen
+                        size={18}
+                        className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
+                        onClick={() => onEdit && onEdit(row)}
+                      />
+                      <OctagonX
+                        size={18}
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => onDelete && onDelete(row.id)}
+                      />
+                    </td>
+                  </tr>
                 ))}
 
-                <td className="px-4 py-4 flex gap-4">
-                  <SquarePen
-                    size={18}
-                    className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
-                    onClick={() => onEdit && onEdit(row)}
-                  />
-                  <OctagonX
-                    size={18}
-                    className="text-red-600 hover:text-red-800 cursor-pointer"
-                    onClick={() => onDelete && onDelete(row.id)}
-                  />
-                </td>
-              </tr>
-            ))}
-
-            {/* FILLER ROWS */}
-            {Array.from({ length: emptyRows }).map((_, index) => (
-              <tr key={`empty-${index}`}>
-                {columns.map((col) => (
-                  <td
-                    key={String(col.key)}
-                    className="px-4 py-2 text-gray-200 select-none"
-                  >
-                    •
-                  </td>
+                {Array.from({ length: emptyRows }).map((_, index) => (
+                  <tr key={`empty-${index}`}>
+                    {columns.map((col) => (
+                      <td
+                        key={String(col.key)}
+                        className="px-4 py-2 text-gray-200 select-none"
+                      >
+                        •
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-gray-200 select-none">•</td>
+                  </tr>
                 ))}
-                <td className="px-4 py-2 text-gray-200 select-none">•</td>
-              </tr>
-            ))}
+              </>
+            )}
           </tbody>
-
-          {/* <tbody>
-            {pagedData.map((row) => (
-              <tr
-                key={row.id}
-                className="hover:bg-gray-50 transition-colors shadow-xs last:border-none"
-              >
-                {columns.map((col) => (
-                  <td
-                    key={String(col.key)}
-                    className="px-4 py-2 text-gray-700 text-sm"
-                  >
-                    {
-                      col.render
-                        ? col.render(row) 
-                        : String(row[col.key]) 
-                    }
-                  </td>
-                ))}
-
-                <td className="px-4 py-3 flex gap-4">
-                  <SquarePen
-                    size={18}
-                    className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
-                    onClick={() => onEdit && onEdit(row)}
-                  />
-                  <OctagonX
-                    size={18}
-                    className="text-red-600 hover:text-red-800 cursor-pointer"
-                    onClick={() => onDelete && onDelete(row.id)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody> */}
         </table>
       </div>
 
