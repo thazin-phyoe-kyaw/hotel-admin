@@ -22,24 +22,20 @@
 // export const config = {
 //   matcher: ["/", "/login", "/admin/:path*"],
 // };
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   const { pathname } = req.nextUrl;
 
-  // No token → only allow login page
-  if (!token) {
-    if (pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-    return NextResponse.next();
+  // Not logged in → block admin routes
+  if (!token && pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Has token → prevent visiting / or /login
-  if (token && (pathname === "/" || pathname === "/login")) {
+  // Logged in → block login page
+  if (token && pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 
@@ -47,6 +43,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // matcher: ["/", "/login", "/admin/:path*"],
-  matcher: ["/((?!_next|api).*)"],
+  matcher: ["/admin/:path*", "/login"],
 };
