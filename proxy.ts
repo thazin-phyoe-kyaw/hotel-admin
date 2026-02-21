@@ -1,4 +1,3 @@
-
 // import { NextResponse } from "next/server";
 // import type { NextRequest } from "next/server"; // Type သတ်မှတ်ရန်
 
@@ -24,7 +23,6 @@
 //   matcher: ["/", "/login", "/admin/:path*"],
 // };
 
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -49,5 +47,6 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/admin/:path*"],
+  // matcher: ["/", "/login", "/admin/:path*"],
+  matcher: ["/((?!_next|api).*)"],
 };
