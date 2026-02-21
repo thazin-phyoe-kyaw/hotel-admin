@@ -22,10 +22,10 @@
 // export const config = {
 //   matcher: ["/", "/login", "/admin/:path*"],
 // };
-// import { NextResponse } from "next/server";
-// import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-// export function proxy(req: NextRequest) {
+export function proxy(req: NextRequest) {
 //   const token = req.cookies.get("token")?.value;
 //   const { pathname } = req.nextUrl;
 
@@ -44,4 +44,4 @@
 
 // export const config = {
 //   matcher: ["/admin/:path*", "/login"],
-// };
+};
