@@ -25,16 +25,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   const { pathname } = req.nextUrl;
 
-  // Not logged in → block admin routes
+  // Block admin when not logged in
   if (!token && pathname.startsWith("/admin")) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Logged in → block login page
+  // Redirect logged-in users away from login page
   if (token && pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
