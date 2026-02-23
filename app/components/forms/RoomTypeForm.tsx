@@ -33,7 +33,6 @@ export default function RoomTypeForm({ mode, data, onClose, onSuccess }: any) {
     },
   });
 
- 
   useEffect(() => {
     if (mode === "edit" && data?.id) {
       reset({
@@ -69,7 +68,7 @@ export default function RoomTypeForm({ mode, data, onClose, onSuccess }: any) {
         await api.post(
           `/api/hotel/admin/room-types/${data.id}?_method=PUT`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
       }
 
@@ -148,7 +147,6 @@ export default function RoomTypeForm({ mode, data, onClose, onSuccess }: any) {
         />
       </div>
 
-      
       <div className="p-4 flex justify-end space-x-4 bg-white fixed bottom-0 left-0 right-0 ">
         <button
           type="button"
@@ -162,13 +160,16 @@ export default function RoomTypeForm({ mode, data, onClose, onSuccess }: any) {
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 bg-[#b778e9] text-white rounded-lg flex items-center gap-2"
+          className={`
+    px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 
+    transition ${submitting ? "opacity-60" : "hover:bg-purple-600"}
+  `}
         >
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
 
-          {mode === "add" ? "Add Room Type" : "Update Room Type"}
+          Submit
         </button>
       </div>
     </form>

@@ -104,13 +104,22 @@ export default function HotelAmenities() {
           {
             key: "is_active",
             label: "Active",
-            sortable: true,
-            render: (row: HotelAmenity) =>
-              row.is_active ? (
-                <CheckCircle className="text-green-500 w-5 h-5" />
-              ) : (
-                <XCircle className="text-red-500 w-5 h-5" />
-              ),
+            render: (row: any) => (
+              <span
+                className={`
+      inline-flex justify-center items-center
+      py-0.5 rounded-full font-medium
+      ${
+        row.is_active === true
+          ? "bg-green-200 text-green-700"
+          : "bg-red-200 text-red-700"
+      }
+    `}
+                style={{ width: "70px" }}
+              >
+                {row.is_active ? "Active" : "Inactive"}
+              </span>
+            ),
           },
         ]}
         onAdd={handleAdd}
@@ -118,7 +127,6 @@ export default function HotelAmenities() {
         onDelete={handleDeleteRequest}
       />
 
-      {/* Drawer */}
       <Drawer
         open={drawerOpen}
         title={

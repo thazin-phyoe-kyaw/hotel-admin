@@ -19,9 +19,6 @@ export default function RoomsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  // =========================
-  // ✅ Fetch Rooms
-  // =========================
   const fetchRooms = useCallback(async () => {
     try {
       setLoading(true);
@@ -38,9 +35,6 @@ export default function RoomsPage() {
     fetchRooms();
   }, [fetchRooms]);
 
-  // =========================
-  // ✅ Delete Room
-  // =========================
   const handleDelete = useCallback(async () => {
     if (!deleteId) return;
 
@@ -55,9 +49,6 @@ export default function RoomsPage() {
     }
   }, [deleteId, fetchRooms]);
 
-  // =========================
-  // Add/Edit Handlers
-  // =========================
   const handleAdd = () => {
     setSelectedRoom(null);
     setDrawerMode("add");
@@ -74,10 +65,6 @@ export default function RoomsPage() {
     setDeleteId(typeof id === "number" ? id : parseInt(id));
     setDeleteModalOpen(true);
   };
-
-  // =========================
-  // Table Format (same UI)
-  // =========================
 
   const tableRooms = rooms.map((room: any) => ({
     id: room.id,
@@ -146,11 +133,16 @@ export default function RoomsPage() {
             label: "Status",
             render: (row: any) => (
               <span
-                className={
-                  row.status === "Active"
-                    ? "px-2 py-1 bg-green-200 text-green-700 rounded-md"
-                    : "px-2 py-1 bg-red-200 text-red-700 rounded-md"
-                }
+                className={`
+      inline-flex justify-center items-center
+      py-0.5 rounded-full font-medium
+      ${
+        row.status === "Active"
+          ? "bg-green-200 text-green-700"
+          : "bg-red-200 text-red-700"
+      }
+    `}
+                style={{ width: "70px" }}
               >
                 {row.status}
               </span>

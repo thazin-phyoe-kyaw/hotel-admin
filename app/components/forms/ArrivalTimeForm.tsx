@@ -8,7 +8,6 @@ import Toggle from "../ui/Toggle";
 import api from "@/app/lib/api";
 import { useAuthStore } from "@/app/store/authStore";
 
-
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
   active: z.boolean().default(true),
@@ -23,7 +22,6 @@ export default function ArrivalTimeForm({
   const hotelId = useAuthStore((state) => state.hotelId);
   const [submitting, setSubmitting] = useState(false);
 
-  
   const {
     register,
     control,
@@ -49,7 +47,6 @@ export default function ArrivalTimeForm({
     }
   }, [mode, data?.id, reset]);
 
-  
   const onSubmit = async (values: any) => {
     if (submitting) return;
     setSubmitting(true);
@@ -76,10 +73,8 @@ export default function ArrivalTimeForm({
     }
   };
 
- 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-24">
-   
       <div>
         <label>Name</label>
         <input
@@ -117,13 +112,16 @@ export default function ArrivalTimeForm({
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+          // className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+          className={`
+    px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 
+    transition ${submitting ? "opacity-60" : "hover:bg-purple-600"}
+  `}
         >
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
-
-          {mode === "add" ? "Add Arrival Time" : "Update Arrival Time"}
+          Submit
         </button>
       </div>
     </form>

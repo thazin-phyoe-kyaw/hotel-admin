@@ -11,7 +11,7 @@ import { useAuthStore } from "@/app/store/authStore";
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
   icon: z.any().optional(),
-  active: z.boolean().default(true),
+  is_active: z.boolean().default(true),
 });
 
 export default function HotelAmenityForm({
@@ -22,7 +22,7 @@ export default function HotelAmenityForm({
 }: any) {
   const hotelId = useAuthStore((state) => state.hotelId);
   const [preview, setPreview] = useState(data?.icon || null);
-  const [submitting, setSubmitting] = useState(false); 
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
@@ -34,7 +34,7 @@ export default function HotelAmenityForm({
     resolver: zodResolver(schema),
     defaultValues: {
       name: data?.name || "",
-      active: data?.active ?? true,
+      is_active: data?.is_active ?? true,
     },
   });
 
@@ -42,11 +42,11 @@ export default function HotelAmenityForm({
     if (mode === "edit" && data?.id) {
       reset({
         name: data?.name ?? "",
-        active: data?.active ?? true,
+        is_active: data?.is_active ?? true,
       });
       setPreview(data?.icon || null);
     } else {
-      reset({ name: "", active: true });
+      reset({ name: "", is_active: true });
       setPreview(null);
     }
   }, [mode, data?.id, reset]);
@@ -59,7 +59,7 @@ export default function HotelAmenityForm({
       const formData = new FormData();
       formData.append("hotel_id", hotelId ?? "");
       formData.append("name", values.name);
-      formData.append("active", values.active ? "1" : "0");
+      formData.append("is_active", values.is_active ? "1" : "0");
 
       if (values.icon?.[0]) {
         formData.append("icon", values.icon[0]);
@@ -138,7 +138,7 @@ export default function HotelAmenityForm({
       <div className="flex justify-between items-center">
         <label className="font-semibold">Active</label>
         <Controller
-          name="active"
+          name="is_active"
           control={control}
           render={({ field }) => (
             <Toggle checked={field.value} onChange={field.onChange} />
@@ -159,13 +159,17 @@ export default function HotelAmenityForm({
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+          // className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+          className={`
+    px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 
+    transition ${submitting ? "opacity-60" : "hover:bg-purple-600"}
+  `}
         >
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
-
-          {mode === "add" ? "Add Hotel Amenity" : "Update Hotel Amenity"}
+          Submit
+          {/* {mode === "add" ? "Add Hotel Amenity" : "Update Hotel Amenity"} */}
         </button>
       </div>
     </form>

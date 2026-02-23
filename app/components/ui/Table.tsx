@@ -24,6 +24,9 @@ export default function DataTable<T extends { id: string | number }>({
   searchPlaceholder = "Search...",
   name,
   loading,
+  hideActions = false,
+  hideSearch = false,
+  hideAdd = false,
 }: TableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
@@ -32,14 +35,12 @@ export default function DataTable<T extends { id: string | number }>({
 
   const ITEMS_PER_PAGE = 10;
 
-  // search
   const filteredData = useMemo(() => {
     return data.filter((row) =>
       Object.values(row).join(" ").toLowerCase().includes(search.toLowerCase()),
     );
   }, [data, search]);
 
-  // sort
   const sortedData = useMemo(() => {
     if (!sortKey) return filteredData;
 
@@ -53,7 +54,6 @@ export default function DataTable<T extends { id: string | number }>({
     });
   }, [filteredData, sortKey, sortDir]);
 
-  // pagi
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
   const pagedData = sortedData.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -73,8 +73,7 @@ export default function DataTable<T extends { id: string | number }>({
 
   return (
     <div className="bg-white shadow rounded-md p-2 flex flex-col h-[calc(100vh-170px)]">
-      {/* Search */}
-      <div className="flex justify-between items-center mb-4">
+      {/* <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">{name?.toUpperCase()} </h1>
         <div className="ml-auto flex items-center">
           <div className="relative">
@@ -96,6 +95,34 @@ export default function DataTable<T extends { id: string | number }>({
             Add {name}
           </button>
         </div>
+      </div> */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">{name?.toUpperCase()}</h1>
+
+        {!hideSearch && (
+          <div className="ml-auto flex items-center">
+            <div className="relative">
+              <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder}
+                className="shadow-sm border border-gray-400 pl-10 pr-3 py-2 rounded-lg"
+              />
+            </div>
+
+            {!hideAdd && onAdd && (
+              <button
+                className="ml-3 flex items-center bg-[#b778e9] text-white px-3 py-2 rounded-lg hover:bg-[#804ba8]"
+                onClick={onAdd}
+              >
+                <PlusCircleIcon className="w-5 h-5 mr-2" />
+                Add {name}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* table container */}
@@ -115,7 +142,10 @@ export default function DataTable<T extends { id: string | number }>({
                   </div>
                 </th>
               ))}
-              <th className="px-4 py-3 text-left font-semibold">Actions</th>
+              {!hideActions && (
+                <th className="px-4 py-3 text-left font-semibold">Actions</th>
+              )}
+              {/* <th className="px-4 py-3 text-left font-semibold">Actions</th> */}
             </tr>
           </thead>
 
@@ -139,7 +169,6 @@ export default function DataTable<T extends { id: string | number }>({
               ))
             ) : (
               <>
-               
                 {pagedData.map((row) => (
                   <tr
                     key={row.id}
@@ -153,8 +182,26 @@ export default function DataTable<T extends { id: string | number }>({
                         {col.render ? col.render(row) : String(row[col.key])}
                       </td>
                     ))}
+                    {!hideActions && (
+                      <td className="px-4 py-4 flex gap-4">
+                        {onEdit && (
+                          <SquarePen
+                            size={18}
+                            className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
+                            onClick={() => onEdit(row)}
+                          />
+                        )}
+                        {onDelete && (
+                          <OctagonX
+                            size={18}
+                            className="text-red-600 hover:text-red-800 cursor-pointer"
+                            onClick={() => onDelete(row.id)}
+                          />
+                        )}
+                      </td>
+                    )}
 
-                    <td className="px-4 py-4 flex gap-4">
+                    {/* <td className="px-4 py-4 flex gap-4">
                       <SquarePen
                         size={18}
                         className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
@@ -165,7 +212,7 @@ export default function DataTable<T extends { id: string | number }>({
                         className="text-red-600 hover:text-red-800 cursor-pointer"
                         onClick={() => onDelete && onDelete(row.id)}
                       />
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
 

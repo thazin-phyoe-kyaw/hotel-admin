@@ -14,4 +14,7 @@ export interface TableProps<T> {
   name?: string;
   onAdd?: () => void;
   loading?: boolean;
+  hideActions?: boolean;
+  hideSearch?: boolean;
+  hideAdd?: boolean;
 }

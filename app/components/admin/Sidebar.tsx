@@ -5,23 +5,18 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Home,
-  BedDouble,
-  Users,
-  CalendarCheck,
-  Settings,
   LogOut,
   X,
   HelpCircle,
   Loader2,
   Building2,
-  HeartHandshake,
   Heart,
   Clock,
-  GalleryVertical,
   GalleryVerticalEnd,
   MessageSquareHeart,
   Grid2X2,
   SquaresExclude,
+  LandmarkIcon,
 } from "lucide-react";
 
 import { useSidebar } from "@/app/hooks/useSidebar";
@@ -40,7 +35,11 @@ const menuGroups = [
         icon: Heart,
       },
       { name: "Arrival Times", href: "/admin/arrival-times", icon: Clock },
-      { name: "Hotel Booking", href: "/admin/bookings", icon: GalleryVerticalEnd },
+      {
+        name: "Hotel Booking",
+        href: "/admin/bookings",
+        icon: GalleryVerticalEnd,
+      },
       {
         name: "Hotel Reviews",
         href: "/admin/hotel-reviews",
@@ -48,6 +47,7 @@ const menuGroups = [
       },
       { name: "Room Type", href: "/admin/room-types", icon: Grid2X2 },
       { name: "Room", href: "/admin/rooms", icon: SquaresExclude },
+      { name: "Bank Account", href: "/admin/bank-account", icon: LandmarkIcon },
     ],
   },
   {
@@ -139,12 +139,12 @@ export default function Sidebar() {
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="flex items-center gap-3 px-4 py-2.5 
+          className={`flex items-center gap-3 px-4 py-2.5 
              text-red-600 font-medium bg-red-50/50 
              hover:bg-red-500 hover:text-white 
              rounded-lg border border-red-100 
              shadow-sm hover:shadow-md hover:shadow-red-200
-             transition-all duration-300"
+             transition-all duration-300 ${isLoggingOut ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           {isLoggingOut ? (
             <Loader2 size={20} className="animate-spin" />

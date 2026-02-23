@@ -106,7 +106,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-24">
-     
       <div>
         <label className="font-semibold">Room Type</label>
         <select
@@ -129,7 +128,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         )}
       </div>
 
-    
       <div>
         <label className="font-semibold">Room Name</label>
         <input
@@ -142,7 +140,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         )}
       </div>
 
-     
       <div>
         <label className="font-semibold">Room Number</label>
         <input
@@ -155,7 +152,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         )}
       </div>
 
-   
       <div>
         <label className="font-semibold">Features</label>
         <div className="grid grid-cols-1 gap-2">
@@ -172,7 +168,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         </div>
       </div>
 
-      
       <div>
         <label className="font-semibold">Price</label>
         <input
@@ -186,7 +181,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         )}
       </div>
 
-     
       <div className="flex justify-between items-center">
         <label className="font-semibold">Active</label>
 
@@ -199,7 +193,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         />
       </div>
 
-     
       <div className="p-4 flex justify-end space-x-4 bg-white fixed bottom-0 left-0 right-0">
         <button
           type="button"
@@ -213,13 +206,16 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2"
+          className={`
+    px-4 py-2 bg-purple-500 text-white rounded-lg flex items-center gap-2 
+    transition ${submitting ? "opacity-60" : "hover:bg-purple-600"}
+  `}
         >
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
 
-          {mode === "add" ? "Create Room" : "Update Room"}
+          Submit
         </button>
       </div>
     </form>

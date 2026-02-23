@@ -12,7 +12,7 @@ import ArrivalTimeForm from "@/app/components/forms/ArrivalTimeForm";
 type ArrivalTime = {
   id: string | number;
   name: string;
-  active?: boolean; // if API has active column
+  active?: boolean; 
 };
 
 export default function ArrivalTimes() {
