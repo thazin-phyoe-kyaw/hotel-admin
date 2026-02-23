@@ -55,7 +55,7 @@ export default function HotelBookingPage() {
             key: "image",
             label: "Image",
             sortable: false,
-            render: (row) => (
+            render: (row:any) => (
               <img
                 src={row.image}
                 alt={row.name}
