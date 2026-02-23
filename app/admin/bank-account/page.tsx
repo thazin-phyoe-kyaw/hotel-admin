@@ -41,7 +41,7 @@ export default function BankAccounts() {
   const handleDelete = useCallback(async () => {
     if (!deleteId) return;
     try {
-      await api.delete(`/api/hotel/admin/bank-accounts/${deleteId}`);
+      await api.delete(`/api/hotel/bank-accounts/${deleteId}`);
       await fetchBankAccounts();
     } catch (error) {
       console.error("Failed to delete bank account", error);

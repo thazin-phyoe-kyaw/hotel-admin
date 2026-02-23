@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import Toggle from "../ui/Toggle";
+import { useAuthStore } from "@/app/store/authStore";
 
 const schema = z.object({
   hotel_room_type_id: z.string().min(1, "Room type is required"),
@@ -22,7 +23,7 @@ const schema = z.object({
 export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
   const [roomTypes, setRoomTypes] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-
+  const hotelId = useAuthStore((state) => state.hotelId);
   const {
     register,
     handleSubmit,
@@ -77,6 +78,7 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
     try {
       const payload = {
         ...formData,
+        hotel_id: hotelId,
         is_active: formData.is_active ? 1 : 0,
       };
 
@@ -214,7 +216,6 @@ export default function RoomForm({ mode, data, onClose, onSuccess }: any) {
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
-
           Submit
         </button>
       </div>

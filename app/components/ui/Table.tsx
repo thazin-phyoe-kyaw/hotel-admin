@@ -5,6 +5,7 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  CopyIcon,
   OctagonX,
   Pencil,
   PlusCircleIcon,
@@ -27,6 +28,7 @@ export default function DataTable<T extends { id: string | number }>({
   hideActions = false,
   hideSearch = false,
   hideAdd = false,
+  onDuplicate,
 }: TableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
@@ -73,29 +75,6 @@ export default function DataTable<T extends { id: string | number }>({
 
   return (
     <div className="bg-white shadow rounded-md p-2 flex flex-col h-[calc(100vh-170px)]">
-      {/* <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">{name?.toUpperCase()} </h1>
-        <div className="ml-auto flex items-center">
-          <div className="relative">
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={searchPlaceholder}
-              className="shadow-sm border border-gray-400 pl-10 pr-3 py-2 rounded-lg focus:outline-none  focus:ring-1 focus:ring-[#b778e9] focus:border-[#b778e9] transition w-fullb"
-            />
-          </div>
-
-          <button
-            className="ml-3 flex items-center bg-[#b778e9] text-white px-3 py-2 rounded-lg hover:bg-[#804ba8]"
-            onClick={() => onAdd && onAdd()}
-          >
-            <PlusCircleIcon className="w-5 h-5 mr-2" />
-            Add {name}
-          </button>
-        </div>
-      </div> */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">{name?.toUpperCase()}</h1>
 
@@ -145,7 +124,6 @@ export default function DataTable<T extends { id: string | number }>({
               {!hideActions && (
                 <th className="px-4 py-3 text-left font-semibold">Actions</th>
               )}
-              {/* <th className="px-4 py-3 text-left font-semibold">Actions</th> */}
             </tr>
           </thead>
 
@@ -184,6 +162,16 @@ export default function DataTable<T extends { id: string | number }>({
                     ))}
                     {!hideActions && (
                       <td className="px-4 py-4 flex gap-4">
+                        {onDuplicate && (
+                          <button
+                            onClick={() => onDuplicate(row)}
+                            className=" text-blue-600 hover:bg-blue-100 rounded"
+                            title="Duplicate"
+                          >
+                            <CopyIcon className="w-5 h-5" />{" "}
+                          </button>
+                        )}
+
                         {onEdit && (
                           <SquarePen
                             size={18}
@@ -200,19 +188,6 @@ export default function DataTable<T extends { id: string | number }>({
                         )}
                       </td>
                     )}
-
-                    {/* <td className="px-4 py-4 flex gap-4">
-                      <SquarePen
-                        size={18}
-                        className="text-[#b778e9] hover:text-[#804ba8] cursor-pointer"
-                        onClick={() => onEdit && onEdit(row)}
-                      />
-                      <OctagonX
-                        size={18}
-                        className="text-red-600 hover:text-red-800 cursor-pointer"
-                        onClick={() => onDelete && onDelete(row.id)}
-                      />
-                    </td> */}
                   </tr>
                 ))}
 

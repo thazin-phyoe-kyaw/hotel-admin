@@ -60,10 +60,10 @@ export default function HotelReviewPage() {
     console.log(id);
     console.log(current);
     try {
-      // await api.patch(`/api/hotel/admin/hotel-reviews/${id}/toggle`, {
-      //   is_show: !current,
-      // });
-      // fetchHotelReviews();
+      await api.post(`api/hotel/reviews/${id}/toggle-visibility`, {
+        is_show: !current,
+      });
+      fetchHotelReviews();
     } catch (error) {
       console.error("Toggle failed", error);
     }

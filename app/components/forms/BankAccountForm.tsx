@@ -157,7 +157,8 @@ export default function BankAccountForm({
           {submitting && (
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           )}
-          {mode === "add" ? "Add Bank Account" : "Update Bank Account"}
+          Submit
+          {/* {mode === "add" ? "Add Bank Account" : "Update Bank Account"} */}
         </button>
       </div>
     </form>

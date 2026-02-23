@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CheckCircle, XCircle } from "lucide-react";
-
 import api from "@/app/lib/api";
 import DataTable from "@/app/components/ui/Table";
 import Drawer from "@/app/components/ui/Drawer";
@@ -21,7 +19,6 @@ export default function ArrivalTimes() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"add" | "edit">("add");
   const [selectedRow, setSelectedRow] = useState<ArrivalTime | null>(null);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
 
@@ -40,7 +37,6 @@ export default function ArrivalTimes() {
 
   const handleDelete = useCallback(async () => {
     if (!deleteId) return;
-
     try {
       await api.delete(`/api/hotel/admin/arrival-times/${deleteId}`);
       await fetchArrivalTimes();
@@ -97,7 +93,7 @@ export default function ArrivalTimes() {
         open={drawerOpen}
         title={drawerMode === "add" ? "Add Arrival Time" : "Edit Arrival Time"}
         onClose={() => setDrawerOpen(false)}
-        onSubmit={() => {}} // not needed; form handles submit
+        onSubmit={() => {}} 
       >
         <ArrivalTimeForm
           mode={drawerMode}

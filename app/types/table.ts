@@ -17,4 +17,5 @@ export interface TableProps<T> {
   hideActions?: boolean;
   hideSearch?: boolean;
   hideAdd?: boolean;
+  onDuplicate?: (row: any) => void;
 }
